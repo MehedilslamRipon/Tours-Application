@@ -1,0 +1,12 @@
+[
+   {
+      "name": "ripon",
+      "age": 22,
+      "details": {
+         "hello": "bangladesh"
+      }
+   },
+   {
+      "anotherName": "hello"
+   }
+]
