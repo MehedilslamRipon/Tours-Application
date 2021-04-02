@@ -73,6 +73,7 @@ typings/
 .yarn-integrity
 
 # dotenv environment variables file
+config.env
 .env
 .env.test
 .env*.local
@@ -80,6 +81,9 @@ typings/
 # parcel-bundler cache (https://parceljs.org/)
 .cache
 .parcel-cache
+
+# extra file
+problem.txt
 
 # Next.js build output
 .next
