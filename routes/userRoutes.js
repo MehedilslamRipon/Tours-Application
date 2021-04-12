@@ -1,5 +1,6 @@
 // dependencies
 const express = require("express");
+const { signup, login } = require("./../controllers/authController");
 
 const {
    getAllUsers,
@@ -10,6 +11,9 @@ const {
 } = require("./../controllers/userController");
 
 const router = express.Router();
+
+router.post("/signup", signup);
+router.post("/login", login);
 
 // user routes
 router.route("/").get(getAllUsers).post(createUser);
