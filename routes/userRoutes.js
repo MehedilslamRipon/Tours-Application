@@ -1,6 +1,11 @@
 // dependencies
 const express = require("express");
-const { signup, login } = require("./../controllers/authController");
+const {
+   signup,
+   login,
+   resetPassword,
+   forgotPassword,
+} = require("./../controllers/authController");
 
 const {
    getAllUsers,
@@ -12,8 +17,17 @@ const {
 
 const router = express.Router();
 
+// signup
 router.post("/signup", signup);
+
+// login
 router.post("/login", login);
+
+// forgot password
+router.post("/forgotPassword", forgotPassword);
+
+// reset password
+router.patch("/resetPassword/:token", resetPassword);
 
 // user routes
 router.route("/").get(getAllUsers).post(createUser);
