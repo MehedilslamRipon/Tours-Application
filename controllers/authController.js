@@ -17,6 +17,18 @@ const signToken = (id) => {
    });
 };
 
+const createSendToken = (user, statusCode, res) => {
+   const token = signToken(user._id);
+
+   res.status(statusCode).json({
+      status: "success",
+      token,
+      data: {
+         user,
+      },
+   });
+};
+
 exports.signup = catchAsync(async (req, res) => {
    // const newUser = await User.create(req.body);
 
@@ -28,7 +40,9 @@ exports.signup = catchAsync(async (req, res) => {
       role: req.body.role,
    });
 
-   const token = signToken(newUser._id);
+   createSendToken(newUser, 201, res);
+
+   /* const token = signToken(newUser._id);
 
    res.status(201).json({
       status: "success",
@@ -36,7 +50,7 @@ exports.signup = catchAsync(async (req, res) => {
       data: {
          user: newUser,
       },
-   });
+   }); */
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -48,7 +62,7 @@ exports.login = catchAsync(async (req, res, next) => {
    }
 
    // check if user exist && password is correct
-   const user = await User.findOne({ email: email }).select("+password");
+   const user = await User.findOne({ email }).select("+password");
    // const correct = await user.correctPassword(password, user.password);
 
    if (!user || !(await user.correctPassword(password, user.password))) {
@@ -56,13 +70,15 @@ exports.login = catchAsync(async (req, res, next) => {
    }
 
    // if everything ok, send token to client
-   const token = signToken(user._id);
+   createSendToken(user, 200, res);
+
+   /* const token = signToken(user._id);
 
    // send response
    res.status(200).json({
       status: "success",
       token,
-   });
+   }); */
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -196,12 +212,32 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
    await user.save();
 
    // update changePasswordAt property for the user
-   const token = signToken(user._id);
+   createSendToken(user, 200, res);
+
+   /* const token = signToken(user._id);
 
    res.status(200).json({
       status: "success",
       token,
-   });
+   }); */
 
    // log the user in, send JET
+});
+
+exports.updatePassword = catchAsync(async (req, res, next) => {
+   // get user from the collection
+   const user = await User.findById(req.user.id).select("+password");
+
+   // check if POSTed current password is correct
+   if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+      return next(new AppError("Your current password is wrong.", 401));
+   }
+
+   // IF so, update password
+   user.password = req.body.password;
+   user.passwordConfirm = req.body.passwordConfirm;
+   await user.save();
+
+   // Log user in, send JWT
+   createSendToken(user, 200, res);
 });
