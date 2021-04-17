@@ -1,6 +1,5 @@
 // dependencies
 const crypto = require("crypto");
-
 const { promisify } = require("util");
 const jwt = require("jsonwebtoken");
 const User = require("./../models/userModel");
@@ -31,6 +30,9 @@ const createSendToken = (user, statusCode, res) => {
    if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
 
    res.cookie("jwt", token, cookieOptions);
+
+   // remove the password from output
+   user.password = undefined;
 
    res.status(statusCode).json({
       status: "success",
