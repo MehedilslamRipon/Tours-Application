@@ -1,9 +1,10 @@
 // dependencies
 // const fs = require("fs");
 const Tour = require("./../models/tourModel");
-const APIFeatures = require("./../utils/apiFeatures");
+// const APIFeatures = require("./../utils/apiFeatures");
 const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/appError");
+const factory = require("./handlerFactory");
 
 // middleware
 exports.aliasTopTours = (req, res, next) => {
@@ -19,7 +20,9 @@ exports.aliasTopTours = (req, res, next) => {
 ); */
 
 // tour router handlers
-exports.getAllTours = catchAsync(async (req, res) => {
+exports.getAllTours = factory.getAll(Tour);
+
+/* catchAsync(async (req, res) => {
    // try {
    // console.log(req.query);
    // console.log(req.query.page);
@@ -91,12 +94,16 @@ exports.getAllTours = catchAsync(async (req, res) => {
    //       message: err,
    //    });
    // }
-});
+}); */
 
-exports.getSingleTour = catchAsync(async (req, res, next) => {
+exports.getSingleTour = factory.getOne(Tour, { path: "reviews" });
+
+/* catchAsync(async (req, res, next) => {
    // try {
    // console.log(req.params);
-   const tour = await Tour.findById(req.params.id);
+   const tour = await (await Tour.findById(req.params.id)).populate(
+      "reviews"
+   );
 
    if (!tour) {
       return next(new AppError("No tour found with that ID", 404));
@@ -114,9 +121,11 @@ exports.getSingleTour = catchAsync(async (req, res, next) => {
    //       message: err,
    //    });
    // }
-});
+}); */
 
-exports.createTour = catchAsync(async (req, res, next) => {
+exports.createTour = factory.createOne(Tour);
+
+/* catchAsync(async (req, res, next) => {
    const newTour = await Tour.create(req.body);
 
    res.status(201).json({
@@ -126,26 +135,28 @@ exports.createTour = catchAsync(async (req, res, next) => {
       },
    });
 
-   /* try {
-      const newTour = await Tour.create(req.body);
+   // try {
+   //    const newTour = await Tour.create(req.body);
 
-      res.status(201).json({
-         status: "success",
-         data: {
-            tour: newTour,
-         },
-      });
-   } 
+   //    res.status(201).json({
+   //       status: "success",
+   //       data: {
+   //          tour: newTour,
+   //       },
+   //    });
+   // } 
    
-   catch (err) {
-      res.status(400).json({
-         status: "fail",
-         message: err,
-      });
-   } */
-});
+   // catch (err) {
+   //    res.status(400).json({
+   //       status: "fail",
+   //       message: err,
+   //    });
+   // }
+}); */
 
-exports.updateTour = catchAsync(async (req, res, next) => {
+exports.updateTour = factory.updateOne(Tour);
+
+/* catchAsync(async (req, res, next) => {
    // try {
    const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
@@ -168,9 +179,11 @@ exports.updateTour = catchAsync(async (req, res, next) => {
    //       message: err,
    //    });
    // }
-});
+}); */
 
-exports.deleteTour = catchAsync(async (req, res, next) => {
+exports.deleteTour = factory.deleteOne(Tour);
+
+/* exports.deleteTour = catchAsync(async (req, res, next) => {
    // try {
    const tour = await Tour.findByIdAndDelete(req.params.id);
 
@@ -188,7 +201,7 @@ exports.deleteTour = catchAsync(async (req, res, next) => {
    //       message: err,
    //    });
    // }
-});
+}); */
 
 exports.getTourStats = catchAsync(async (req, res, next) => {
    // try {
@@ -282,4 +295,74 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
    //       message: err,
    //    });
    // }
+});
+
+// router
+//    .route("/monthly-plan/:year")
+//    .get(protect, restrictTo("admin", "lead-guide", "guide"), getMonthlyPlan);
+
+//    router.route('/tours-within/:distance/center/:letlng/unit/:unit', getTourWithin)
+
+exports.getTourWithin = catchAsync(async (req, res, next) => {
+   const { distance, letlng, unit } = req.params;
+   const [lat, lng] = letlng.split(",");
+
+   const radius = unit === "mi" ? distance / 3963.2 : distance / 6378.1;
+
+   if (!lat || !lng) {
+      next(
+         new AppError("Please provide lat and lng in the format lat,lng", 400)
+      );
+   }
+
+   const tours = await Tour.find({
+      startLocation: { $geoWithin: { $centerSphere: [lng, lat], radius } },
+   });
+
+   res.status(200).json({
+      status: "success",
+      results: tours.length,
+      data: {
+         data: tours,
+      },
+   });
+});
+
+exports.getDistances = catchAsync(async (req, res, next) => {
+   const { letlng, unit } = req.params;
+   const [lat, lng] = letlng.split(",");
+
+   const multiplier = unit === "mi" ? 0.000621371 : 0.001;
+
+   if (!lat || !lng) {
+      return next(
+         new AppError("Please provide lat and lng in the format lat,lng", 400)
+      );
+   }
+
+   const distances = await Tour.aggregate([
+      {
+         $geoNear: {
+            near: {
+               type: "Point",
+               coordinates: [lng * 1, lat * 1],
+            },
+            distanceField: "distance",
+            distanceMultiplier: multiplier,
+         },
+      },
+      {
+         $project: {
+            distance: 1,
+            name: 1,
+         },
+      },
+   ]);
+
+   res.status(200).json({
+      status: "success",
+      data: {
+         data: distances,
+      },
+   });
 });

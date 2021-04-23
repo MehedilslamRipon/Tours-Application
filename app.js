@@ -13,6 +13,9 @@ const globalErrorHandler = require("./controllers/errorController");
 const tourRouter = require("./routes/tourRoutes");
 const userRouter = require("./routes/userRoutes");
 
+const reviewRouter = require('./routes/reviewRoutes');
+
+
 const app = express();
 
 // global middleware
@@ -63,6 +66,9 @@ app.use("/api/v1/tours", tourRouter);
 
 // user router
 app.use("/api/v1/users", userRouter);
+
+// review router
+app.use("/api/v1/reviews", reviewRouter);
 
 // handled route
 app.all("*", (req, res, next) => {
