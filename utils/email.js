@@ -1,10 +1,8 @@
-// dependencies
-const nodemailer = require("nodemailer");
+const nodemailer = require('nodemailer');
 
 const sendEmail = async (options) => {
-   // create a transporter
+   // 1) Create a transporter
    const transporter = nodemailer.createTransport({
-      // service: "Gmail",
       host: process.env.EMAIL_HOST,
       port: process.env.EMAIL_PORT,
       auth: {
@@ -13,16 +11,16 @@ const sendEmail = async (options) => {
       },
    });
 
-   // define the email options
+   // 2) Define the email options
    const mailOptions = {
-      from: "Mehedi Islam Ripon <hello@xerox.com>",
+      from: 'Jonas Schmedtmann <hello@jonas.io>',
       to: options.email,
       subject: options.subject,
       text: options.message,
       // html:
    };
 
-   // actually send the email
+   // 3) Actually send the email
    await transporter.sendMail(mailOptions);
 };
 

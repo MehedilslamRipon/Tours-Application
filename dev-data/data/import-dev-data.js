@@ -1,13 +1,13 @@
-const fs = require("fs");
-const mongoose = require("mongoose");
-const dotenv = require("dotenv");
-dotenv.config({ path: "./.env" });
-const Tour = require("./../../models/tourModel");
-const Review = require("./../../models/reviewModel");
-const User = require("./../../models/userModel");
+const fs = require('fs');
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+dotenv.config({ path: './.env' });
+const Tour = require('./../../models/tourModel');
+const Review = require('./../../models/reviewModel');
+const User = require('./../../models/userModel');
 
 const DB = process.env.DATABASE.replace(
-   "<PASSWORD>",
+   '<PASSWORD>',
    process.env.DATABASE_PASSWORD
 );
 
@@ -21,9 +21,11 @@ mongoose
    .then(() => console.log(`🎇 Database Connection Successful!`));
 
 // read JSON file
-const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`, "utf-8"));
-const users = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`, "utf-8"));
-const reviews = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`, "utf-8"));
+const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`, 'utf-8'));
+const users = JSON.parse(fs.readFileSync(`${__dirname}/users.json`, 'utf-8'));
+const reviews = JSON.parse(
+   fs.readFileSync(`${__dirname}/reviews.json`, 'utf-8')
+);
 
 // import data into DB
 const importData = async () => {
@@ -51,9 +53,9 @@ const deleteData = async () => {
    process.exit();
 };
 
-if (process.argv[2] === "--import") {
+if (process.argv[2] === '--import') {
    importData();
-} else if (process.argv[2] === "--delete") {
+} else if (process.argv[2] === '--delete') {
    deleteData();
 }
 
