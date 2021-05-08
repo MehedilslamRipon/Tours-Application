@@ -1323,3 +1323,37 @@ body {
    -webkit-transform: translateY(-2px);
    transform: translateY(-2px);
 }
+
+.card-container .card {
+   position: relative;
+}
+.card-container .card .card-icon-buttons {
+   position: absolute;
+   right: 6px;
+   z-index: 9999;
+}
+.card-container .card .card-icon-buttons .single-btn svg {
+   height: 100%;
+   width: 100%;
+   fill: #55c57a;
+   stroke: #55c57a;
+}
+.card-container .card .card-icon-buttons .single-btn {
+   position: absolute;
+   padding: 6px;
+   left: -26px;
+   top: 8px;
+   width: 2.5rem;
+   height: 2.5rem;
+   border: none;
+   border-radius: 100%;
+   background: #ecf0f1;
+   cursor: pointer;
+   transition: all 0.7s ease-in-out;
+}
+.card-container .card:hover .card-icon-buttons .btn-delete {
+   left: -55px;
+}
+/* .card-container .card:hover .card-icon-buttons .btn-update {
+   left: -55px;
+} */
